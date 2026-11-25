@@ -1,0 +1,135 @@
+EXPERIMENT 3 — K-Fold Cross-Validation, Bias-Variance & Learning Curves
+Aim
+To implement K-fold cross-validation and analyze model performance using learning curves.
+Theory
+K-Fold Cross-Validation
+Data is divided into K equal folds. The model is trained K times, with one fold used for validation each time.
+
+For 5-fold CV:
+- 4 folds for training
+- 1 fold for validation
+- Repeat 5 times
+Bias-Variance Tradeoff
+- High bias: Model is too simple → underfitting.
+- High variance: Model is too complex → overfitting.
+- Balanced: Model generalizes well.
+Single-cell code
+# Experiment 3: Cross Validation and Learning Curves
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import KFold, cross_val_score, learning_curve
+from sklearn.tree import DecisionTreeClassifier
+
+X, y = load_breast_cancer(return_X_y=True)
+
+model = DecisionTreeClassifier(max_depth=5, random_state=42)
+
+# 5-fold Cross Validation
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+scores = cross_val_score(model, X, y, cv=kf, scoring="accuracy")
+
+print("Fold Accuracies:", scores)
+print("Mean Accuracy:", scores.mean())
+
+# Learning curve
+sizes, train_scores, val_scores = learning_curve(
+    model, X, y, cv=5, train_sizes=np.linspace(0.1, 1.0, 5),
+    scoring="accuracy", random_state=42
+)
+
+train_mean = train_scores.mean(axis=1)
+val_mean = val_scores.mean(axis=1)
+
+plt.plot(sizes, train_mean, marker="o", label="Training Accuracy")
+plt.plot(sizes, val_mean, marker="o", label="Validation Accuracy")
+plt.xlabel("Training Samples")
+plt.ylabel("Accuracy")
+plt.title("Learning Curve")
+plt.legend()
+plt.grid()
+plt.show()
+
+Write-up
+Result: Cross-validation accuracy was calculated and learning curves were plotted to analyze training and validation performance.
+
+Conclusion: Cross-validation provides reliable model evaluation, while learning curves help identify underfitting and overfitting.
+Expected viva
+- What is K-fold CV? A technique that divides data into K parts and evaluates a model K times.
+- What is bias? Error due to overly simple assumptions.
+- What is variance? Sensitivity to changes in training data.
+- What is overfitting? High training performance but poor unseen-data performance.
+- What is underfitting? Model fails to learn the patterns adequately.
+- What does a learning curve show? Model performance as training data size increases.
+
+
+
+EXPERIMENT 4 — Gradient Descent
+Aim
+To implement Gradient Descent and understand optimization of a cost function.
+Theory
+Gradient Descent minimizes the cost function by repeatedly updating parameters in the opposite direction of the gradient.
+\[
+\theta_{new}=\theta_{old}-\alpha\frac{\partial J}{\partial\theta}
+\]
+
+Where:
+- \(\theta\) = parameter/weight
+- \(\alpha\) = learning rate
+- \(J\) = cost function
+- Gradient = direction of increase in cost
+Single-cell code
+# Experiment 4: Gradient Descent
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Dataset: y = 2x
+X = np.array([1, 2, 3, 4, 5], dtype=float)
+y = 2 * X
+
+w = 0.0
+learning_rate = 0.01
+epochs = 100
+
+losses = []
+
+for epoch in range(epochs):
+    predictions = w * X
+
+    # Mean Squared Error
+    loss = np.mean((predictions - y) ** 2)
+    losses.append(loss)
+
+    # Gradient
+    dw = (2 / len(X)) * np.sum((predictions - y) * X)
+
+    # Update weight
+    w = w - learning_rate * dw
+
+    if epoch % 10 == 0:
+        print("Epoch:", epoch, "Weight:", round(w, 4),
+              "Loss:", round(loss, 4))
+
+print("\nFinal Weight:", w)
+
+plt.plot(losses)
+plt.xlabel("Epoch")
+plt.ylabel("MSE Loss")
+plt.title("Gradient Descent Loss")
+plt.grid()
+plt.show()
+
+Write-up
+Result: Gradient Descent was implemented and the weight was iteratively updated. The loss reduced over the iterations.
+
+Conclusion: Gradient Descent optimizes model parameters by minimizing the cost function.
+Expected viva
+- What is Gradient Descent? An optimization algorithm that minimizes a cost function.
+- What is learning rate? Step size used during weight updates.
+- What if learning rate is too high? The algorithm may overshoot or diverge.
+- What if learning rate is too low? Convergence becomes slow.
+- What is an epoch? One complete pass through training data.
+- What is MSE? Mean Squared Error, the average squared difference between actual and predicted values.

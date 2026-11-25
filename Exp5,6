@@ -1,0 +1,148 @@
+EXPERIMENT 5 — Linear Regression with L1 & L2 Regularization
+Aim
+To implement Linear Regression with L1 (Lasso) and L2 (Ridge) regularization.
+Theory
+Linear Regression predicts continuous values using a linear equation:
+\[
+y=mx+c
+\]
+
+Regularization prevents overfitting by penalizing large weights.
+Method	Penalty	Effect
+L1 / Lasso	\(\lambda\sum|w_i|\)	Can make weights zero; feature selection
+L2 / Ridge	\(\lambda\sum w_i^2\)	Shrinks weights; generally keeps features
+
+Single-cell code
+# Experiment 5: Linear Regression, Lasso and Ridge
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
+from sklearn.metrics import mean_squared_error, r2_score
+
+X, y = make_regression(
+    n_samples=300, n_features=10, noise=20, random_state=42
+)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+models = {
+    "Linear Regression": LinearRegression(),
+    "Lasso (L1)": Lasso(alpha=1.0),
+    "Ridge (L2)": Ridge(alpha=1.0)
+}
+
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
+
+    print("\n", name)
+    print("MSE:", mean_squared_error(y_test, pred))
+    print("R2 Score:", r2_score(y_test, pred))
+
+# Visualize actual vs predicted
+model = LinearRegression()
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+plt.scatter(y_test, pred)
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.title("Actual vs Predicted")
+plt.grid()
+plt.show()
+Write-up
+Result: Linear Regression, Lasso and Ridge were implemented and their MSE and R² scores were compared.
+
+Conclusion: Regularization reduces overfitting by penalizing large model coefficients. Lasso can perform feature selection, while Ridge reduces coefficient magnitude.
+Expected viva
+- What is Linear Regression? A model predicting continuous values using a linear relationship.
+- What is regularization? A technique to reduce overfitting by penalizing large coefficients.
+- What is Lasso? Linear regression with L1 regularization.
+- What is Ridge? Linear regression with L2 regularization.
+- Which performs feature selection? Lasso, because some coefficients can become zero.
+- What is R²? A measure of how much variation in the target is explained by the model.
+- What is MSE? Average squared prediction error.
+
+
+
+EXPERIMENT 6 — Support Vector Machine (SVM)
+Aim
+To implement and analyze the Support Vector Machine algorithm for classification.
+Theory
+SVM finds the best hyperplane that separates different classes while maximizing the margin.
+- Hyperplane: Decision boundary separating classes.
+- Margin: Distance between hyperplane and nearest data points.
+- Support vectors: Data points closest to the decision boundary.
+- Kernel: Transforms data to help separate nonlinear patterns.
+Common kernels:
+- Linear
+- Polynomial
+- RBF
+Single-cell code
+# Experiment 6: SVM Classification
+
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import make_pipeline
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+X, y = load_breast_cancer(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# SVM with RBF kernel and scaling
+model = make_pipeline(
+    StandardScaler(),
+    SVC(kernel="rbf", C=1, gamma="scale")
+)
+
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("Accuracy:", accuracy_score(y_test, pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, pred))
+print("\nReport:\n", classification_report(y_test, pred))
+
+# Visualization using two features
+X2 = X[:, :2]
+
+X2_train, X2_test, y2_train, y2_test = train_test_split(
+    X2, y, test_size=0.2, random_state=42
+)
+
+svm2 = make_pipeline(StandardScaler(), SVC(kernel="linear"))
+svm2.fit(X2_train, y2_train)
+
+print("\n2-feature SVM Accuracy:",
+      accuracy_score(y2_test, svm2.predict(X2_test)))
+
+plt.scatter(X2[:, 0], X2[:, 1], c=y, cmap="coolwarm")
+plt.xlabel("Feature 1")
+plt.ylabel("Feature 2")
+plt.title("SVM Dataset Visualization")
+plt.show()
+Write-up
+Result: SVM was trained on a classification dataset and evaluated using accuracy and a confusion matrix.
+
+Conclusion: SVM classifies data by finding an optimal decision boundary with maximum margin. Kernels enable classification of nonlinear data.
+Expected viva
+- What is SVM? A supervised learning algorithm used mainly for classification.
+- What is a hyperplane? A boundary separating classes.
+- What are support vectors? Data points closest to the decision boundary.
+- What is the margin? Distance between boundary and support vectors.
+- What is a kernel? Function that helps SVM handle nonlinear patterns.
+- What is the RBF kernel? A nonlinear kernel based on distance between points.
+- Why scale features? SVM is sensitive to differences in feature scales.
+

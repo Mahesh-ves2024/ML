@@ -1,0 +1,128 @@
+EXPERIMENT 1 — Anaconda, Colab & ML Libraries
+Aim
+To study platforms such as Anaconda and Google Colab and understand commonly used machine learning libraries.
+Theory
+- Anaconda: Python distribution containing Python, Jupyter Notebook and data science libraries.
+- Google Colab: Cloud-based notebook that executes Python without local installation.
+- NumPy: Numerical calculations and arrays.
+- Pandas: Data handling and analysis.
+- Matplotlib: Graphs and visualization.
+- Seaborn: Statistical visualization.
+- Scikit-learn: ML algorithms, preprocessing and evaluation.
+- TensorFlow/PyTorch: Deep learning.
+Single-cell code# Experiment 1: Study ML platforms and libraries
+
+import sys
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import sklearn
+
+print("Python Version:", sys.version)
+print("NumPy:", np.__version__)
+print("Pandas:", pd.__version__)
+print("Scikit-learn:", sklearn.__version__)
+
+# NumPy array
+arr = np.array([10, 20, 30, 40, 50])
+print("\nNumPy Array:", arr)
+print("Mean:", np.mean(arr))
+
+# Pandas DataFrame
+df = pd.DataFrame({
+    "Name": ["A", "B", "C"],
+    "Marks": [80, 90, 75]
+})
+print("\nDataFrame:")
+print(df)
+
+# Visualization
+plt.plot(arr, marker='o')
+plt.title("Simple Line Graph")
+plt.xlabel("Index")
+plt.ylabel("Value")
+plt.grid()
+plt.show()
+
+# ML example
+from sklearn.datasets import load_iris
+data = load_iris()
+print("\nDataset Shape:", data.data.shape)
+print("Features:", data.feature_names)
+print("Target Classes:", data.target_names)
+Write-up
+Result: Successfully studied Python-based ML platforms and libraries and performed numerical computation, data handling and visualization.
+
+Conclusion: Anaconda provides a local ML environment while Colab provides a cloud-based notebook environment. Libraries simplify ML implementation.
+Expected viva
+- What is Anaconda? A Python distribution containing data science tools and packages.
+- What is Colab? An online notebook platform for executing Python code.
+- What is NumPy? Library for numerical computing.
+- What is Pandas? Library for data manipulation.
+- What is Scikit-learn? Library for machine learning algorithms.
+- What is Jupyter Notebook? Interactive environment containing code, output and explanations.
+
+
+
+EXPERIMENT 2 — Complete ML Pipeline & Model Evaluation
+Aim
+To perform data preprocessing, train a classification model and evaluate its performance.
+Theory
+The ML pipeline consists of:
+1. Data collection
+2. Data cleaning
+3. Feature selection
+4. Data preprocessing
+5. Train-test splitting
+6. Model training
+7. Prediction
+8. Evaluation
+Classification predicts categories, while regression predicts continuous numerical values.
+
+# Experiment 2: ML Pipeline and Evaluation
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Load dataset
+data = load_breast_cancer()
+X, y = data.data, data.target
+
+# Train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Create pipeline
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression(max_iter=2000))
+])
+
+# Train
+pipeline.fit(X_train, y_train)
+
+# Predict
+y_pred = pipeline.predict(X_test)
+
+# Evaluate
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("\nConfusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred))
+
+Write-up
+Result: A classification model was trained using preprocessing and evaluated using accuracy, confusion matrix, precision, recall and F1-score.
+
+Conclusion: The ML pipeline simplifies and organizes the complete process from preprocessing to model evaluation.
+Expected viva
+- What is preprocessing? Preparing raw data for machine learning.
+- Why split data? To evaluate the model on unseen data.
+- What is training data? Data used to learn model parameters.
+- What is testing data? Data used to evaluate the trained model.
+- What is a pipeline? A sequence of preprocessing and model steps.
+- What is data leakage? When information from test data improperly influences training.

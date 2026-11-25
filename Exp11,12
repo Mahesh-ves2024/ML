@@ -1,0 +1,251 @@
+EXPERIMENT 11 — PCA & t-SNE Dimensionality Reduction
+Aim
+To implement PCA and t-SNE for dimensionality reduction and visualization.
+Theory
+Dimensionality reduction reduces the number of features while retaining important information.
+PCA – Principal Component Analysis
+- Linear dimensionality reduction.
+- Finds directions of maximum variance.
+- Creates new features called principal components.
+- Useful for compression, visualization and noise reduction.
+t-SNE
+- Nonlinear dimensionality reduction.
+- Preserves local similarity between data points.
+- Useful for visualizing high-dimensional data in 2D or 3D.
+- Primarily a visualization technique.
+Single-cell code
+# Experiment 11: PCA and t-SNE
+
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+
+data = load_iris()
+X, y = data.data, data.target
+
+# Standardization
+X_scaled = StandardScaler().fit_transform(X)
+
+# PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+print("PCA Shape:", X_pca.shape)
+print("Explained Variance Ratio:", pca.explained_variance_ratio_)
+print("Total Explained Variance:",
+      sum(pca.explained_variance_ratio_))
+
+# t-SNE
+tsne = TSNE(n_components=2, perplexity=30,
+             random_state=42, init="pca", learning_rate="auto")
+X_tsne = tsne.fit_transform(X_scaled)
+
+# Plot PCA
+plt.figure(figsize=(6, 4))
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap="viridis")
+plt.title("PCA Visualization")
+plt.xlabel("PC1")
+plt.ylabel("PC2")
+plt.show()
+
+# Plot t-SNE
+plt.figure(figsize=(6, 4))
+plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y, cmap="viridis")
+plt.title("t-SNE Visualization")
+plt.xlabel("Component 1")
+plt.ylabel("Component 2")
+plt.show()
+
+Write-up
+Result: PCA and t-SNE were applied to the Iris dataset, reducing the feature space to two dimensions and visualizing the class distribution.
+
+Conclusion: PCA preserves maximum global variance using linear transformations, while t-SNE is useful for visualizing local patterns and clusters in high-dimensional data.
+Expected viva
+- What is dimensionality reduction? Reducing the number of features in a dataset.
+- What is PCA? Linear transformation that finds directions of maximum variance.
+- What is a principal component? A new feature formed as a combination of original features.
+- What is explained variance? Amount of original information/variance retained by a component.
+- What is t-SNE? Nonlinear dimensionality reduction technique mainly used for visualization.
+- PCA vs t-SNE? PCA preserves variance and is linear; t-SNE focuses on local structure and is nonlinear.
+- Why scale before PCA? Features with larger scales can dominate the components.
+
+
+
+
+EXPERIMENT 12 — MLOps, Git & Automated ML Pipeline
+Aim
+To understand MLOps fundamentals by creating an ML development environment, using Git for version control and building an automated ML pipeline for preprocessing, training and evaluation.
+Theory
+MLOps (Machine Learning Operations) combines machine learning, software engineering and operations to automate the ML lifecycle.
+Main components
+- Git: Tracks code changes and versions.
+- Version Control: Maintains different versions of code.
+- Pipeline: Automates preprocessing, model training and evaluation.
+- Automation: Executes processes automatically.
+- Model evaluation: Checks model performance before deployment.
+- Deployment: Makes a trained model available for use.
+Pipeline flow
+Data Collection
+
+
+Preprocessing
+
+
+Model Training
+
+
+Evaluation
+
+
+Save Model / Deployment
+
+
+Single-cell code
+# Experiment 12: MLOps + ML Pipeline + Git + Automation
+
+import os
+import subprocess
+import joblib
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+# 1. Load dataset
+X, y = load_iris(return_X_y=True)
+
+# 2. Split dataset
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 3. Create automated pipeline
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression(max_iter=1000))
+])
+
+# 4. Train model
+pipeline.fit(X_train, y_train)
+
+# 5. Evaluate model
+pred = pipeline.predict(X_test)
+accuracy = accuracy_score(y_test, pred)
+
+print("Model Accuracy:", accuracy)
+
+# 6. Save trained model
+joblib.dump(pipeline, "iris_model.pkl")
+print("Model saved as iris_model.pkl")
+
+# 7. Load model and predict
+loaded_model = joblib.load("iris_model.pkl")
+print("Sample Prediction:", loaded_model.predict(X_test[:5]))
+
+# 8. Git version control
+try:
+    subprocess.run(["git", "init"], check=True, capture_output=True)
+    subprocess.run(["git", "config", "user.name", "ML Student"],
+                   check=True)
+    subprocess.run(["git", "config", "user.email", "student@example.com"],
+                   check=True)
+
+    # Save a small result file
+    with open("results.txt", "w") as f:
+        f.write(f"Accuracy: {accuracy}\n")
+
+    subprocess.run(["git", "add", "iris_model.pkl", "results.txt"],
+                   check=True)
+    subprocess.run(["git", "commit", "-m", "Initial ML model"],
+                   check=True, capture_output=True)
+
+    print("Git commit created successfully!")
+
+except Exception as e:
+    print("Git operation:", e)
+
+# 9. Create automation workflow file
+os.makedirs(".github/workflows", exist_ok=True)
+
+workflow = """
+name: ML Pipeline
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install numpy pandas scikit-learn
+
+      - run: python train.py
+"""
+
+with open(".github/workflows/ml.yml", "w") as f:
+    f.write(workflow)
+
+print("GitHub Actions workflow file created!")
+print("MLOps pipeline completed.")
+
+Write-up
+Result: An automated ML pipeline was created for preprocessing, training and evaluation. The model was saved, and Git was used to demonstrate version control. An automation workflow file was generated.
+
+Conclusion: MLOps improves reproducibility, automation, model tracking and reliability throughout the machine learning lifecycle.
+Expected viva
+- What is MLOps? Practices combining ML and DevOps to automate and manage ML systems.
+- What is Git? Distributed version control system.
+- What is GitHub? Online platform for hosting Git repositories.
+- What is a pipeline? Sequence of automated ML steps.
+- What is version control? Tracking changes in code and files over time.
+- What is CI? Continuous Integration—automatically checking and integrating code changes.
+- What is CD? Continuous Delivery/Deployment—automating release or deployment.
+- What is model deployment? Making a trained model available for practical use.
+- Why save the model? So it can be reused for predictions without retraining.
+
+Important correction for Experiment 12
+To make the generated GitHub Actions workflow actually runnable, add this small section before creating the workflow file in Experiment 12:
+# Create train.py for automated GitHub Actions execution
+
+train_script = """
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+
+X, y = load_iris(return_X_y=True)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+model = Pipeline([
+    ('scaler', StandardScaler()),
+    ('classifier', LogisticRegression(max_iter=1000))
+])
+
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print('Automated ML Accuracy:', accuracy_score(y_test, pred))
+"""
+
+with open("train.py", "w") as f:
+    f.write(train_script)
+
+print("train.py created for automation!")  

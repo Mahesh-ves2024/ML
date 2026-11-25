@@ -1,0 +1,139 @@
+EXPERIMENT 7 — Logistic Regression
+Aim
+To implement Logistic Regression for binary classification.
+Theory
+Logistic Regression predicts the probability of a class using the sigmoid function:
+\[
+\sigma(z)=\frac{1}{1+e^{-z}}
+\]
+
+Where:
+\[
+z=wX+b
+\]
+
+If probability is at least 0.5, the model predicts class 1; otherwise class 0.
+
+Despite its name, Logistic Regression is a classification algorithm.
+Single-cell code
+# Experiment 7: Logistic Regression
+
+import matplotlib.pyplot as plt
+
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+X, y = load_breast_cancer(return_X_y=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+model = LogisticRegression(max_iter=2000)
+model.fit(X_train, y_train)
+
+pred = model.predict(X_test)
+prob = model.predict_proba(X_test)
+
+print("Accuracy:", accuracy_score(y_test, pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, pred))
+print("\nClassification Report:\n", classification_report(y_test, pred))
+
+print("\nFirst 5 Probabilities:")
+print(prob[:5])
+
+plt.bar(range(5), prob[:5, 1])
+plt.xlabel("Sample")
+plt.ylabel("Probability of Class 1")
+plt.title("Logistic Regression Probabilities")
+plt.show()
+
+Write-up
+Result: Logistic Regression was implemented and used to classify the dataset. The predicted probabilities and evaluation metrics were obtained.
+
+Conclusion: Logistic Regression is suitable for binary classification and estimates the probability of belonging to a class.
+Expected viva
+- Why is Logistic Regression used for classification? It predicts class probabilities using a sigmoid function.
+- What is the sigmoid function? It maps any real number to the range 0 to 1.
+- What is the threshold? The probability cutoff used to determine the class.
+- Default threshold? Usually 0.5.
+- What is binary classification? Classification into two classes.
+- What is predict_proba()? Returns predicted class probabilities.
+- Logistic vs Linear Regression? Linear predicts continuous values; Logistic predicts class probabilities.
+
+
+
+
+EXPERIMENT 8 — Logic Gates using MP Neurons
+Aim
+To implement logic gates using McCulloch-Pitts (MP) neurons.
+Theory
+The MP neuron is a binary neuron. It calculates weighted input and activates when the input reaches the threshold.
+\[
+Y=
+\begin{cases}
+1,& \sum w_ix_i\geq\theta\\
+0,& \text{otherwise}
+\end{cases}
+\]
+
+Where:
+- \(x_i\) = binary inputs
+- \(w_i\) = weights
+- \(\theta\) = threshold
+Single-cell code
+# Experiment 8: Logic Gates using MP Neurons
+
+def mp_neuron(inputs, weights, threshold):
+    total = sum(x * w for x, w in zip(inputs, weights))
+    return 1 if total >= threshold else 0
+
+gates = {
+    "AND":  ([1, 1], 2),
+    "OR":   ([1, 1], 1),
+    "NAND": ([-1, -1], -1),
+}
+
+print("A B | AND OR NAND")
+for A in [0, 1]:
+    for B in [0, 1]:
+        AND = mp_neuron([A, B], [1, 1], 2)
+        OR = mp_neuron([A, B], [1, 1], 1)
+        NAND = mp_neuron([A, B], [-1, -1], -1)
+
+        print(A, B, "|", AND, OR, NAND)
+
+# NOT Gate (single input)
+print("\nNOT Gate")
+for A in [0, 1]:
+    NOT = mp_neuron([A], [-1], 0)
+    print(A, "->", NOT)
+
+# XOR using OR and NAND and AND:
+# XOR = (A OR B) AND (A NAND B)
+print("\nXOR Gate")
+for A in [0, 1]:
+    for B in [0, 1]:
+        OR = mp_neuron([A, B], [1, 1], 1)
+        NAND = mp_neuron([A, B], [-1, -1], -1)
+        XOR = mp_neuron([OR, NAND], [1, 1], 2)
+        print(A, B, "->", XOR)
+
+Write-up
+Result: AND, OR, NAND, NOT and XOR logic gates were implemented using threshold-based MP neurons.
+
+Conclusion: MP neurons perform simple binary computations using weights and threshold values. A single MP neuron cannot directly implement XOR, but multiple neurons can be combined.
+Expected viva
+- What is an MP neuron? A mathematical binary neuron with weighted inputs and a threshold.
+- What is a threshold? Minimum weighted sum required to activate the neuron.
+- What is the output? Binary 0 or 1.
+- Can a single MP neuron implement XOR? No.
+- Why can't XOR be implemented by a single neuron? XOR is not linearly separable.
+- What is a logic gate? A circuit performing a Boolean operation.

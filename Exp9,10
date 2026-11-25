@@ -1,0 +1,165 @@
+EXPERIMENT 9 — Multi-Layer Perceptron & Backpropagation
+Aim
+To implement a Multi-Layer Perceptron and show weight changes during backpropagation.
+Theory
+An MLP contains:
+- Input layer
+- Hidden layer(s)
+- Output layer
+Backpropagation updates weights by calculating error and propagating it backward.
+Steps
+1. Forward propagation: calculate output.
+2. Calculate error.
+3. Backpropagate error.
+4. Calculate gradients.
+5. Update weights and biases.
+\[
+W_{new}=W_{old}-\eta\frac{\partial L}{\partial W}
+\]
+
+Single-cell code
+# Experiment 9: MLP and Backpropagation manually
+
+import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# One sample
+X = np.array([[1.0, 0.0]])
+target = np.array([[1.0]])
+
+# 2 input -> 2 hidden -> 1 output
+W1 = np.array([[0.2, 0.4],
+               [0.3, 0.5]])
+
+b1 = np.array([[0.1, 0.1]])
+
+W2 = np.array([[0.6],
+               [0.7]])
+
+b2 = np.array([[0.1]])
+
+lr = 0.5
+
+print("Initial W1:\n", W1)
+print("Initial W2:\n", W2)
+
+# Forward propagation
+hidden = sigmoid(X @ W1 + b1)
+output = sigmoid(hidden @ W2 + b2)
+
+loss = 0.5 * (target - output) ** 2
+
+print("\nHidden Output:", hidden)
+print("Output:", output)
+print("Loss:", loss)
+
+# Backpropagation
+delta2 = (output - target) * output * (1 - output)
+
+dW2 = hidden.T @ delta2
+db2 = delta2
+
+delta1 = (delta2 @ W2.T) * hidden * (1 - hidden)
+
+dW1 = X.T @ delta1
+db1 = delta1
+
+# Update weights
+W2_new = W2 - lr * dW2
+b2_new = b2 - lr * db2
+W1_new = W1 - lr * dW1
+b1_new = b1 - lr * db1
+
+print("\nUpdated W1:\n", W1_new)
+print("Updated W2:\n", W2_new)
+print("Updated b1:\n", b1_new)
+print("Updated b2:\n", b2_new)
+Write-up
+Result: A multilayer neural network was implemented with forward propagation and backpropagation. Weight and bias values were updated using gradients.
+
+Conclusion: Backpropagation reduces prediction error by updating weights throughout the network using gradient descent.
+Expected viva
+- What is MLP? A neural network containing input, hidden and output layers.
+- What is backpropagation? Algorithm used to calculate gradients and update neural network weights.
+- What is forward propagation? Passing inputs through layers to calculate output.
+- What is activation function? Function that introduces nonlinearity.
+- What is sigmoid? Activation function producing outputs between 0 and 1.
+- What is a loss function? Measures prediction error.
+- Why do weights change? To minimize the loss.
+
+
+
+
+EXPERIMENT 10 — Hebbian Learning
+Aim
+To implement the supervised Hebbian learning rule for a single neuron.
+Theory
+Hebbian learning is based on the principle:
+Neurons that fire together, wire together.
+
+Basic weight update:
+\[
+w_i(new)=w_i(old)+\eta x_i y
+\]
+
+Where:
+- \(\eta\) = learning rate
+- \(x_i\) = input
+- \(y\) = target output
+We use bipolar inputs and outputs (-1, +1) in this example.
+Single-cell code
+# Experiment 10: Supervised Hebbian Learning
+
+import numpy as np
+
+# AND gate in bipolar representation
+X = np.array([
+    [-1, -1],
+    [-1,  1],
+    [ 1, -1],
+    [ 1,  1]
+])
+
+y = np.array([-1, -1, -1, 1])
+
+weights = np.zeros(2)
+bias = 0
+learning_rate = 1
+
+print("Initial Weights:", weights)
+
+# Hebbian learning
+for i in range(len(X)):
+    weights += learning_rate * X[i] * y[i]
+    bias += learning_rate * y[i]
+
+    print("Input:", X[i],
+          "Target:", y[i],
+          "Updated Weights:", weights,
+          "Bias:", bias)
+
+# Classification
+def predict(x):
+    net = np.dot(x, weights) + bias
+    return 1 if net >= 0 else -1
+
+print("\nClassification Results:")
+for x in X:
+    print(x, "Prediction:", predict(x))
+
+print("\nFinal Weights:", weights)
+print("Final Bias:", bias)
+
+Write-up
+Result: Hebbian learning was implemented for a single neuron. Weights and bias were updated based on input-target pairs and the classification results were observed.
+
+Conclusion: Hebbian learning modifies weights according to the correlation between inputs and outputs.
+Expected viva
+- What is Hebbian learning? A learning rule that strengthens connections when input and output activate together.
+- What is the Hebbian rule? \(w_i=w_i+\eta x_i y\).
+- What is the learning rate? Controls the magnitude of weight changes.
+- Is Hebbian learning supervised or unsupervised? The classical rule is unsupervised; the version implemented in this experiment uses target outputs, so it is supervised Hebbian learning.
+- What is a neuron? Basic computational unit of a neural network.
+- What is a bipolar value? Values represented as -1 and +1 instead of 0 and 1.
